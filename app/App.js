@@ -25,20 +25,22 @@ export default function App() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}> 
-      <Text style={styles.serviceNameLabel}>"DATA COMPRESSION MACHINE"</Text>                  {/*Header för att välja bild*/}   
+      <Text style={styles.serviceNameLabel}>"DATA COMPRESSION MACHINE"</Text>
 
-      <Text style={styles.label}>Content image</Text>                  {/*Header för att välja bild*/}   
-  
+      {/*Header för att välja bild*/}
+      <Text style={styles.label}>Content image</Text>
       <TouchableOpacity onPress={pickImage} style={styles.imageUploadBox}>
         {contentImage ? (
           <Image source={{ uri: contentImage }} style={styles.uploadedImage} />
         ) : (
-          <Text style={styles.uploadText}>Tap to upload an image</Text>         //placeholder text för text INUTI "choose image rutan" 
+          <Text style={styles.uploadText}>Tap to upload an image</Text> //placeholder text för text INUTI "choose image rutan"
         )}
       </TouchableOpacity>
   
-      <Text style={styles.label}>Select a style</Text>            {/*Header för att välja style*/} 
-      <DropdownWithExpandableIcons />                             {/*KOMPONENT: Style-image dropdownmenu */} 
+      {/*Header för att välja style*/}
+      <Text style={styles.label}>Select a style</Text>
+      {/*KOMPONENT: Style-image dropdownmenu */}
+      <DropdownWithExpandableIcons />
   
       <StatusBar style="auto" />
     </ScrollView>
