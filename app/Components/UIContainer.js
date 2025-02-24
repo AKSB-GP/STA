@@ -1,23 +1,39 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Modal, FlatList, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  FlatList,
+  Image,
+  StyleSheet,
+} from "react-native";
 
 const stylesData = [
   { id: "1", label: "Mona Lisa", image: require("../Assets/mona_lisa.jpg") },
-  { id: "2", label: "Starry Night", image: require("../Assets/starry_night.jpg") },
+  {
+    id: "2",
+    label: "Starry Night",
+    image: require("../Assets/starry_night.jpg"),
+  },
   { id: "3", label: "The Scream", image: require("../Assets/the_scream.jpg") },
-  { id: "4", label: "Girl with a Pearl Earring", image: require("../Assets/girl_with_a_pearl_earring.jpg") },
+  {
+    id: "4",
+    label: "Girl with a Pearl Earring",
+    image: require("../Assets/girl_with_a_pearl_earring.jpg"),
+  },
 ];
 
-const DropdownWithExpandableIcons = () => {
+const DropdownWithExpandableIcons = ({ onStyleSelect }) => {
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [expandedImage, setExpandedImage] = useState(null); // State for expanded image
 
   return (
     <View style={styles.container}>
-
-      {/* Dropdown Button */}
-      <TouchableOpacity onPress={() => setDropdownVisible(true)} style={styles.dropdownButton}>
+      <TouchableOpacity
+        onPress={() => setDropdownVisible(true)}
+        style={styles.dropdownButton}
+      >
         <Text style={styles.dropdownButtonText}>
           {selectedStyle ? selectedStyle.label : "Style"}
         </Text>
@@ -25,51 +41,47 @@ const DropdownWithExpandableIcons = () => {
 
       <View style={styles.divider} />
 
-      {/* GENERATE IMAGE-BUTTON */}
-      <TouchableOpacity onPress={() => /*Vår funktion här senare*/(true)} style={styles.generateButton}>
+      {/* Generate Image Button */}
+      {/* <TouchableOpacity
+        onPress={() => sendToBackend(contentImage, selectedStyle)}
+        style={styles.generateButton}
+      >
         <Text style={styles.generateButtonText}>Generate</Text>
         <Image source={require("../Assets/wand.png")} style={styles.icon} />
-      </TouchableOpacity>
-
-      {/*MODAL: Dropdown Listan  */}
+      </TouchableOpacity> */}
+      {/* {generatedImage && (
+        <View>
+          <Text style={styles.label}>Generated Image</Text>
+          <Image
+            source={{ uri: generatedImage }}
+            style={styles.uploadedImage}
+          />
+        </View>
+      )} */}
       <Modal visible={dropdownVisible} transparent animationType="slide">
         <TouchableOpacity
           style={styles.modalContainer}
           activeOpacity={1}
-          onPress={() => setDropdownVisible(false)} // Close dropdown when tapping outside
+          onPress={() => setDropdownVisible(false)}
         >
           <View style={styles.dropdownList}>
             <FlatList
               data={stylesData}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.dropdownItem}>
-                  {/* Select Style */}
-                  <TouchableOpacity
-                    style={{ flex: 1 }}
-                    onPress={() => {
-                      setSelectedStyle(item);
-                      setDropdownVisible(false);
-                    }}
-                  >
-                    <Text style={styles.dropdownText}>{item.label}</Text>
-                  </TouchableOpacity>
-
-                  {/* Tap to Expand Image */}
-                  <TouchableOpacity onPress={() => setExpandedImage(item.image)}>
-                    <Image source={item.image} style={styles.iconPreview} />
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => {
+                    setSelectedStyle(item);
+                    onStyleSelect(item); // Pass selected style to parent
+                    setDropdownVisible(false);
+                  }}
+                >
+                  <Text style={styles.dropdownText}>{item.label}</Text>
+                </TouchableOpacity>
               )}
             />
           </View>
-        </TouchableOpacity>
-      </Modal>
-
-      {/* MODAL: kunna göra bilden större */}
-      <Modal visible={!!expandedImage} transparent animationType="fade">
-        <TouchableOpacity style={styles.fullscreenModal} onPress={() => setExpandedImage(null)}>
-          <Image source={expandedImage} style={styles.fullscreenImage} />
         </TouchableOpacity>
       </Modal>
     </View>
@@ -89,7 +101,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
-    alignSelf: "center",  // Center this button too
+    alignSelf: "center", // Center this button too
     width: "80%", // Match width with generateButton
     marginTop: 20, // Add spacing
   },
@@ -141,12 +153,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: 'row',
+    flexDirection: "row",
     borderWidth: 1,
     borderColor: "#ccc",
-    alignSelf: "center",  // Center button horizontally
-    width: "80%",  
-    marginTop: 40, 
+    alignSelf: "center", // Center button horizontally
+    width: "80%",
+    marginTop: 40,
   },
   generateButtonText: {
     color: "#fff",
@@ -164,8 +176,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc", // Light gray color
     marginVertical: 10, // Space above and below
   },
-  
-  
 });
 
 export default DropdownWithExpandableIcons;
