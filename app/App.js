@@ -24,28 +24,45 @@ export default function App() {
       setContentImage(result.assets[0].uri);
     }
   };
+  // Pick an image
+  const pickstyleImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      base64: true, // Convert image to base64
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setStyleImage(result.assets[0].uri);
+    }
+  };
 
   // Handle style selection
-  const handleStyleSelect = (selectedStyle) => {
-    setStyleImage(selectedStyle);
-  };
+  // const handleStyleSelect = (selectedStyle) => {
+  //   setStyleImage(selectedStyle);
+  // };
 
   // Send image to backend
   const generateImage = async () => {
     if (!contentImage || !styleImage) {
+      console.log("GENERATEDIMAGE FUNC","CONTENTIMAGE:",contentImage,"STYLEIMAGE:",styleImage);
       alert("Please select both a content image and a style.");
       return;
     }
 
     let formData = new FormData();
+    console.log(formData);
+
     formData.append("content", {
       uri: contentImage,
       type: "image/jpeg",
       name: "content.jpg",
     });
-
+//Image.resolveAssetSource(styleImage.image).uri
     formData.append("style", {
-      uri: Image.resolveAssetSource(styleImage.image).uri, // Convert require() image to URI problem here 
+      uri: styleImage, // Convert require() image to URI problem here 
       type: "image/jpeg",
       name: "style.jpg",
     });
@@ -95,8 +112,13 @@ export default function App() {
         )}
       </TouchableOpacity>
 
-      <Text style={styles.label}>Select a style</Text>
-      <DropdownWithExpandableIcons onStyleSelect={handleStyleSelect} />
+      <TouchableOpacity onPress={pickstyleImage} style={styles.imageUploadBox}>
+        {styleImage ? (
+          <Image source={{ uri: styleImage }} style={styles.uploadedImage} />
+        ) : (
+          <Text style={styles.uploadText}>Tap to upload an style image</Text>
+        )}
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={generateImage} style={styles.generateButton}>
         <Text style={styles.generateButtonText}>Generate</Text>
