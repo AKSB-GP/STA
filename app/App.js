@@ -1,8 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import DropdownWithExpandableIcons from './Components/UIContainer';
+import { StatusBar } from "expo-status-bar";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import DropdownWithExpandableIcons from "./Components/UIContainer";
 
 export default function App() {
   const [contentImage, setContentImage] = useState(null);
@@ -22,6 +30,7 @@ export default function App() {
 
     if (!result.canceled && result.assets.length > 0) {
       setContentImage(result.assets[0].uri);
+      console.log("content", result.assets[0]);
     }
   };
   // Pick an image
@@ -33,9 +42,9 @@ export default function App() {
       quality: 1,
       base64: true, // Convert image to base64
     });
-
     if (!result.canceled && result.assets.length > 0) {
       setStyleImage(result.assets[0].uri);
+      console.log("style", result.assets[0]);
     }
   };
 
@@ -47,55 +56,42 @@ export default function App() {
   // Send image to backend
   const generateImage = async () => {
     if (!contentImage || !styleImage) {
-      console.log("GENERATEDIMAGE FUNC","CONTENTIMAGE:",contentImage,"STYLEIMAGE:",styleImage);
       alert("Please select both a content image and a style.");
       return;
     }
 
-    let formData = new FormData();
-    console.log(formData);
+    let requestData = {
+      content: `data:image/jpeg;base64,${contentImage}`,
+      style: `data:image/jpeg;base64,${styleImage}`,
+    };
 
-    formData.append("content", {
-      uri: contentImage,
-      type: "image/jpeg",
-      name: "content.jpg",
-    });
-//Image.resolveAssetSource(styleImage.image).uri
-    formData.append("style", {
-      uri: styleImage, // Convert require() image to URI problem here 
-      type: "image/jpeg",
-      name: "style.jpg",
-    });
+    console.log("Sending JSON Data:", requestData);
 
     try {
-      setLoading(true); // Show loading indicator
+      setLoading(true);
 
-      let response = await fetch("http://127.0.0.1:5000/generate", {
+      let response = await fetch("http://127.0.0.1:4040/generate", {
         method: "POST",
-        body: formData,
+        mode:  'cors' ,
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate image");
+        throw new Error("Failed to send image");
       }
 
-      let blob = await response.blob();
-
-      // Convert blob to Base64 (React Native does not support createObjectURL)
-      let reader = new FileReader();
-      reader.onloadend = () => {
-        setGeneratedImage(reader.result);
-      };
-      reader.readAsDataURL(blob);
-
-    } catch (error) {
+      let data = await response.json();
+      setGeneratedImage(data.generatedImage);
+    } 
+    catch (error) {
       console.error("Error:", error);
       alert("Failed to generate image.");
-    } finally {
-      setLoading(false); // Hide loading indicator
+    } 
+    finally {
+      setLoading(false);
     }
   };
 
@@ -129,7 +125,10 @@ export default function App() {
       {generatedImage && (
         <>
           <Text style={styles.label}>Generated Image</Text>
-          <Image source={{ uri: generatedImage }} style={styles.generatedImage} />
+          <Image
+            source={{ uri: generatedImage }}
+            style={styles.generatedImage}
+          />
         </>
       )}
 
@@ -142,48 +141,48 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     margin: 20,
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   imageUploadBox: {
     width: 100,
     height: 100,
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 50,
   },
   uploadText: {
-    color: '#888',
-    textAlign: 'center',
+    color: "#888",
+    textAlign: "center",
   },
   uploadedImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
   },
   serviceNameLabel: {
     fontSize: 36,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 150,
   },
   generateButton: {
     padding: 15,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ccc',
-    width: '80%',
+    borderColor: "#ccc",
+    width: "80%",
     marginTop: 20,
   },
   generateButtonText: {
@@ -196,4 +195,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-
